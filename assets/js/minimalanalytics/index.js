@@ -21,7 +21,6 @@
             url: window.location.pathname,
             referrer: document.referrer || '',
             timestamp: new Date().toISOString(),
-            userAgent: navigator.userAgent,
             language: navigator.language,
             screen: {
                 width: window.screen.width,
@@ -42,20 +41,31 @@
         // Use sendBeacon if available for better reliability
         if (navigator.sendBeacon) {
             const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-            navigator.sendBeacon(config.endpoint, blob);
+            const sent = navigator.sendBeacon(config.endpoint, blob);
+            
+            // If sendBeacon fails, fallback to fetch
+            if (!sent) {
+                log('sendBeacon failed, falling back to fetch');
+                sendViaFetch(data);
+            }
         } else {
             // Fallback to fetch
-            fetch(config.endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data),
-                keepalive: true
-            }).catch(err => {
-                log('Error sending analytics:', err);
-            });
+            sendViaFetch(data);
         }
+    }
+
+    // Send via fetch API
+    function sendViaFetch(data) {
+        fetch(config.endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
+            keepalive: true
+        }).catch(err => {
+            log('Error sending analytics:', err);
+        });
     }
 
     // Track page view
