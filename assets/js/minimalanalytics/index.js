@@ -39,13 +39,15 @@
         log('Sending analytics:', data);
 
         // Use sendBeacon if available for better reliability
+        // Note: sendBeacon returns false if the data cannot be queued,
+        // which typically happens due to browser limitations.
+        // When false is returned, we fallback to fetch.
         if (navigator.sendBeacon) {
             const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-            const sent = navigator.sendBeacon(config.endpoint, blob);
+            const queued = navigator.sendBeacon(config.endpoint, blob);
             
-            // If sendBeacon fails, fallback to fetch
-            if (!sent) {
-                log('sendBeacon failed, falling back to fetch');
+            if (!queued) {
+                log('sendBeacon could not queue request, falling back to fetch');
                 sendViaFetch(data);
             }
         } else {
@@ -64,7 +66,7 @@
             body: JSON.stringify(data),
             keepalive: true
         }).catch(err => {
-            log('Error sending analytics:', err);
+            log('Error sending analytics to ' + config.endpoint + ':', err.message || err);
         });
     }
 
