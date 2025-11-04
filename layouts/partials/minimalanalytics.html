@@ -5,9 +5,9 @@
   {{- $opts := dict "minify" (not hugo.IsDevelopment) "shims" $shims "params" site.Params.minimalanalytics -}}
   {{- $js := resources.Get "js/minimalanalytics/index.js" | js.Build $opts -}}
   {{ if hugo.IsDevelopment }}
-    <script src="{{ $js.RelPermalink }}"></script>
+    <script src="{{ $js.RelPermalink }}" async></script>
   {{ else }}
     {{ $js = $js | fingerprint }}
-    <script src="{{ $js.RelPermalink }}"></script>
+    <script src="{{ $js.RelPermalink }}" async></script>
   {{ end }}
 {{ end }}
