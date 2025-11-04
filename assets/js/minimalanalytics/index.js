@@ -1,17 +1,8 @@
+import { track } from 'js/ga4';
+import * as params from '@params';
+
 (function () {
 	'use strict';
-
-	// Configuration
-	const config = {
-		debug: window.minimalAnalyticsDebug || false,
-	};
-
-	// Log helper
-	function log(...args) {
-		if (config.debug) {
-			console.log('[MinimalAnalytics]', ...args);
-		}
-	}
-
-	log('Minimal Analytics initialized');
+	track(params.tracking_id);
+	window.track = track;
 })();
