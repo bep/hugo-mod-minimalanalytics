@@ -1,0 +1,8 @@
+{{- $opts := dict "minify" (not hugo.IsDelopment) -}}
+{{- $js := resources.Get "js/minimalanalytics/index.js" | js.Build $opts -}}
+{{ if hugo.IsDelopment }}
+  <script src="{{ $js.RelPermalink }}" async></script>
+{{ else }}
+  {{ $js = $js | fingerprint }}
+  <script src="{{ $js.RelPermalink }}" async></script>
+{{ end }}
